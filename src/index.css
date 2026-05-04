@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-noir-black: #000000;
+  --color-noir-white: #FFFFFF;
+}
+
+@layer base {
+  body {
+    @apply bg-noir-white text-noir-black selection:bg-noir-black selection:text-noir-white;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  .dark body {
+    @apply bg-noir-black text-noir-white selection:bg-noir-white selection:text-noir-black;
+  }
+}
+
+/* Custom scrollbar to match B&W style */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-noir-white dark:bg-noir-black;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-noir-black/20 dark:bg-noir-white/20 rounded-full;
+}
+
+/* Allow shadows and global transitions */
+* {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shadow-soft {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-soft {
+  box-shadow: 0 4px 20px -5px rgba(255, 255, 255, 0.05);
+}
