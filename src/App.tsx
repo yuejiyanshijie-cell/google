@@ -20,12 +20,16 @@ import {
   Bookmark,
   Settings,
   X,
-  MessageSquare
+  MessageSquare,
+  Plus,
+  Bell,
+  Heart,
+  Share2
 } from 'lucide-react';
 
 // --- Types ---
 
-type Page = 'home' | 'messages' | 'profile' | 'chat_detail' | 'create_picker' | 'create_post' | 'create_channel' | 'create_card';
+type Page = 'home' | 'messages' | 'profile' | 'chat_detail' | 'create_picker' | 'create_post' | 'create_channel';
 
 interface Post {
   id: string;
@@ -74,7 +78,7 @@ const INITIAL_POSTS: Post[] = [
     id: '1',
     author: '虚空游者',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100',
-    content: '在纯粹的黑白中，万物呈现出它们最本质的结构。色彩不过是感官的幻觉。',
+    content: '在纯粹的白空间中，万物呈现出它们最本质的结构。少即是多，空即是满。',
     timestamp: '2小时前',
     type: 'post',
     likes: 12,
@@ -86,7 +90,7 @@ const INITIAL_POSTS: Post[] = [
     id: '2',
     author: '极简主义者',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100',
-    content: '今日摄于荒野。极致的构图不需要色彩来修饰。',
+    content: '今日摄于荒野。极致的构图不需要多余的色彩修饰，只有光线在舞动。',
     image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=800',
     timestamp: '5小时前',
     type: 'post',
@@ -94,18 +98,6 @@ const INITIAL_POSTS: Post[] = [
     isLiked: true,
     isCollected: true,
     comments: 8
-  },
-  {
-    id: 'card-1',
-    author: '光影记录员',
-    avatar: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&q=80&w=100',
-    content: '【群聊邀请】加入“黑白摄影研习社”，共同探索光影轨迹。',
-    timestamp: '刚刚',
-    type: 'post',
-    likes: 5,
-    isLiked: false,
-    isCollected: false,
-    comments: 1
   }
 ];
 
@@ -120,95 +112,54 @@ const MOCK_CHATS: Chat[] = [
   },
   {
     id: 'c2',
-    name: '黑白摄影研习社',
+    name: '极简构图社',
     avatar: 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&q=80&w=100',
-    lastMessage: '张三：分享了一张新照片',
+    lastMessage: '张利：这张白墙的光影太绝了',
     timestamp: '昨天',
     isGroup: true,
     type: 'chat'
-  },
+  }
+];
+
+const MOCK_CHANNELS: Channel[] = [
   {
-    id: 'c3',
-    name: '未知联络人',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100',
-    lastMessage: '[图片消息]',
-    timestamp: '2023/10/24',
-    type: 'chat'
+    id: 'ch1',
+    name: '此时此刻',
+    desc: '全球实时极简影像流',
+    avatar: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=100',
+    memberCount: '1.2k',
+    type: 'channel'
   }
 ];
 
 const INITIAL_HISTORIES: Record<string, Message[]> = {
   'c1': [
     { id: 'm1', sender: 'other', text: '你好。', timestamp: '10:00' },
-    { id: 'm2', sender: 'me', text: '你好。', timestamp: '10:01' },
-    { id: 'm3', sender: 'other', text: '看到你发的帖子了，摄影技术很棒。', timestamp: '10:02' },
-    { id: 'm4', sender: 'me', text: '谢谢，还在学习中。', timestamp: '10:05' },
-  ],
-  'c2': [
-    { id: 'g1', sender: 'other', text: '欢迎加入研习社！', timestamp: '09:00' },
-    { id: 'g2', sender: 'other', text: '张三：分享了一张新照片', timestamp: '09:10' }
-  ],
-  'c3': [
-    { id: 'u1', sender: 'other', text: '[图片消息]', timestamp: '昨天' }
+    { id: 'm2', sender: 'me', text: '你好，很高兴认识你。', timestamp: '10:01' },
   ]
 };
 
-const MOCK_CHANNELS: Channel[] = [
-  {
-    id: 'ch1',
-    name: '此时此刻',
-    desc: '全球实时黑白影像流',
-    avatar: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80&w=100',
-    memberCount: '1.2k',
-    type: 'channel'
-  },
-  {
-    id: 'ch2',
-    name: '极简主义实验室',
-    desc: '探索Less is More的终极边界',
-    avatar: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=100',
-    memberCount: '850',
-    type: 'channel'
-  }
-];
-
 // --- Components ---
 
-const DarkModeToggle = () => {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
-
-  return (
-    <button 
-      onClick={() => setIsDark(!isDark)}
-      className="p-3 rounded-2xl border-2 border-noir-black dark:border-noir-white flex items-center justify-center transition-all hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black shadow-sm hover:shadow-lg active:scale-95"
-    >
-      <div className={`w-5 h-5 rounded-full ${isDark ? 'bg-noir-white' : 'bg-noir-black'}`} />
-    </button>
-  );
-};
-
-interface PageTransitionProps {
-  children: React.ReactNode;
-}
-
-const PageTransition: React.FC<PageTransitionProps> = ({ children }) => (
+const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.2 }}
+    initial={{ opacity: 0, scale: 0.98 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, scale: 1.02 }}
+    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
     className="w-full h-full flex flex-col"
   >
     {children}
   </motion.div>
+);
+
+const IconButton: React.FC<{ icon: any; onClick?: () => void; className?: string }> = ({ icon: Icon, onClick, className }) => (
+  <button 
+    onClick={onClick}
+    className={`p-3 rounded-2xl bg-gray-50 hover:bg-gray-100 active:scale-90 transition-all text-gray-900 group ${className}`}
+  >
+    <Icon size={22} className="group-hover:scale-110 transition-transform" />
+  </button>
 );
 
 export default function App() {
@@ -219,30 +170,22 @@ export default function App() {
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // Form states
   const [newPostText, setNewPostText] = useState('');
-  const [newChannelName, setNewChannelName] = useState('');
-  const [newChannelDesc, setNewChannelDesc] = useState('');
   const [chatInput, setChatInput] = useState('');
 
-  // --- Search Engine Integration ---
-  
+  // --- Search Engine ---
   const searchableData = useMemo(() => [
-    ...posts.map(p => ({ ...p, title: p.author, desc: p.content })),
-    ...MOCK_CHATS.map(c => ({ ...c, title: c.name, desc: c.lastMessage })),
-    ...MOCK_CHANNELS.map(ch => ({ ...ch, title: ch.name, desc: ch.desc }))
+    ...posts.map(p => ({ ...p, title: p.author, desc: p.content, type: 'post' })),
+    ...MOCK_CHATS.map(c => ({ ...c, title: c.name, desc: c.lastMessage, type: 'chat' })),
+    ...MOCK_CHANNELS.map(ch => ({ ...ch, title: ch.name, desc: ch.desc, type: 'channel' }))
   ], [posts]);
 
   const fuse = useMemo(() => new Fuse(searchableData, {
-    keys: ['title', 'desc', 'content', 'author', 'name'],
-    threshold: 0.3,
-    ignoreLocation: true,
-    distance: 100,
-    minMatchCharLength: 1
+    keys: ['title', 'desc'],
+    threshold: 0.3
   }), [searchableData]);
 
   const searchResults = useMemo(() => {
@@ -251,50 +194,16 @@ export default function App() {
   }, [fuse, searchQuery]);
 
   // --- Handlers ---
-
   const handleSendMessage = () => {
     if (!chatInput.trim() || !selectedChat) return;
-    
     const newMessage: Message = {
       id: Date.now().toString(),
       sender: 'me',
       text: chatInput,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-
-    setChatHistories(prev => ({
-      ...prev,
-      [selectedChat.id]: [...(prev[selectedChat.id] || []), newMessage]
-    }));
+    setChatHistories(prev => ({ ...prev, [selectedChat.id]: [...(prev[selectedChat.id] || []), newMessage] }));
     setChatInput('');
-  };
-
-  const toggleLike = (postId: string) => {
-    setPosts(prev => prev.map(p => {
-      if (p.id === postId) {
-        return {
-          ...p,
-          isLiked: !p.isLiked,
-          likes: p.isLiked ? p.likes - 1 : p.likes + 1
-        };
-      }
-      return p;
-    }));
-  };
-
-  const toggleCollect = (postId: string) => {
-    setPosts(prev => prev.map(p => {
-      if (p.id === postId) {
-        return { ...p, isCollected: !p.isCollected };
-      }
-      return p;
-    }));
-  };
-
-  const navigateToChat = (chat: Chat) => {
-    setSelectedChat(chat);
-    setActivePage('chat_detail');
-    setIsSearchOpen(false);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -329,115 +238,98 @@ export default function App() {
     setActivePage('home');
   };
 
-  const handleCreateChannel = () => {
-    if (!newChannelName.trim()) return;
-    setActivePage('home');
-  };
-
-  // --- Layout Components ---
-
   const NavItem = ({ page, icon: Icon, label }: { page: Page, icon: any, label: string }) => {
     const isActive = activePage === page || (page === 'messages' && activePage === 'chat_detail');
     return (
       <button 
         onClick={() => setActivePage(page)}
-        className={`flex lg:flex-row flex-col items-center gap-3 p-4 lg:px-8 lg:py-4 transition-all w-full rounded-2xl
+        className={`flex lg:flex-row flex-col items-center gap-4 p-4 lg:px-6 lg:py-4 transition-all w-full rounded-[1.5rem] relative group
           ${isActive 
-            ? 'bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black font-black shadow-lg translate-x-1' 
-            : 'hover:bg-noir-black/5 dark:hover:bg-noir-white/5 opacity-40 hover:opacity-100 font-bold'}`}
+            ? 'bg-gray-900 text-white shadow-xl shadow-gray-200' 
+            : 'hover:bg-gray-50 text-gray-400 hover:text-gray-900'}`}
       >
-        <Icon size={24} fill={(isActive && (page === 'home' || page === 'profile')) ? 'currentColor' : 'none'} />
-        <span className="text-[10px] lg:text-sm uppercase tracking-[0.2em]">{label}</span>
+        <Icon size={22} className={`${isActive ? 'scale-110' : 'group-hover:scale-110'} transition-transform`} />
+        {isActive && (
+          <motion.div layoutId="nav-pill" className="absolute left-0 w-1 h-6 bg-white rounded-full hidden lg:block" />
+        )}
+        <span className={`text-[10px] lg:text-sm font-bold uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-60'}`}>{label}</span>
       </button>
     );
   };
 
   return (
-    <div className="flex justify-center bg-noir-white dark:bg-noir-black min-h-screen text-noir-black dark:text-noir-white overflow-hidden selection:bg-noir-black selection:text-noir-white dark:selection:bg-noir-white dark:selection:text-noir-black">
+    <div className="flex justify-center bg-white min-h-screen text-gray-900 overflow-hidden font-sans">
       
-      {/* Container with max width for desktop */}
-      <div className="w-full max-w-[1400px] h-[100vh] flex relative">
+      <div className="w-full max-w-[1440px] h-[100vh] flex relative">
         
-        {/* --- LEFT SIDEBAR (Desktop Only Navigation) --- */}
-        <nav className="hidden lg:flex w-80 border-r border-noir-black/5 dark:border-noir-white/5 flex-col py-12 z-40 px-6">
-           <div className="px-4 mb-20 text-center lg:text-left">
-             <h1 className="text-5xl font-black italic tracking-tighter cursor-pointer hover:scale-105 transition-transform" onClick={() => setActivePage('home')}>NOIR.</h1>
+        {/* --- Sidebar --- */}
+        <aside className="hidden lg:flex w-72 border-r border-gray-100 flex-col py-10 px-6 z-40">
+           <div className="px-2 mb-16">
+             <h1 className="text-3xl font-black italic tracking-tighter cursor-pointer hover:rotate-3 transition-transform inline-block" onClick={() => setActivePage('home')}>PURE.</h1>
            </div>
            
-           <div className="flex-1 space-y-3">
-             <NavItem page="home" icon={Star} label="万象首页" />
-             <NavItem page="messages" icon={Circle} label="消息中心" />
+           <nav className="flex-1 space-y-2">
+             <NavItem page="home" icon={Star} label="发现万象" />
+             <NavItem page="messages" icon={MessageSquare} label="即时通讯" />
              <NavItem page="profile" icon={User} label="个人档案" />
-           </div>
+           </nav>
 
            <div className="mt-auto">
              <button 
                onClick={() => setActivePage('create_picker')}
-               className="w-full py-5 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all font-black uppercase tracking-widest text-sm"
+               className="w-full py-4 bg-gray-900 text-white rounded-[1.8rem] hover:shadow-2xl hover:-translate-y-1 active:scale-95 transition-all font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
              >
-               新发布 +
+               <Plus size={18} /> 发布动态
              </button>
            </div>
-        </nav>
+        </aside>
 
-        {/* --- MAIN COLUMN --- */}
-        <main className="flex-1 lg:border-r border-noir-black/10 dark:border-noir-white/10 flex flex-col relative overflow-hidden bg-noir-white dark:bg-noir-black">
+        {/* --- Main Contents --- */}
+        <main className="flex-1 flex flex-col relative overflow-hidden bg-white">
           
-          {/* Global Search Overlay (Full screen on mobile, absolute inside main on desktop) */}
+          {/* Search Overlay */}
           <AnimatePresence>
             {isSearchOpen && (
               <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 bg-noir-white dark:bg-noir-black flex flex-col pt-2 lg:pt-0"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="absolute inset-0 z-50 bg-white/95 backdrop-blur-3xl flex flex-col"
               >
-                <header className="sticky top-0 z-50 bg-noir-white/90 dark:bg-noir-black/90 backdrop-blur-xl border-b border-noir-black/10 dark:border-noir-white/10 px-6 h-16 lg:h-24 flex items-center gap-6 shadow-sm">
-                  <Search size={24} className="opacity-30" />
+                <header className="px-8 h-24 flex items-center gap-6 border-b border-gray-100">
+                  <Search size={22} className="text-gray-300" />
                   <input 
                     autoFocus
-                    placeholder="在这里搜索一切..."
-                    className="flex-1 bg-transparent border-none text-xl lg:text-2xl font-black focus:outline-none placeholder:opacity-10 uppercase tracking-tighter"
+                    placeholder="寻找灵感、好友或频道..."
+                    className="flex-1 bg-transparent border-none text-2xl font-bold focus:outline-none placeholder:text-gray-200"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Escape' && setIsSearchOpen(false)}
                   />
-                  <button onClick={() => setIsSearchOpen(false)} className="p-3 bg-noir-black/5 dark:bg-noir-white/5 rounded-full hover:rotate-90 transition-all"><X size={28} /></button>
+                  <IconButton icon={X} onClick={() => setIsSearchOpen(false)} />
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-4">
-                  {searchResults.length > 0 ? (
-                    searchResults.map((item: any, idx) => (
-                      <div 
-                        key={idx} 
-                        onClick={() => {
-                          if (item.type === 'chat') navigateToChat(item);
-                          else { setActivePage('home'); setIsSearchOpen(false); }
-                        }}
-                        className="p-6 rounded-3xl bg-noir-black/5 dark:bg-noir-white/5 flex items-center gap-6 hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black cursor-pointer group transition-all hover:shadow-xl hover:-translate-y-1"
-                      >
-                         <div className="text-[10px] font-black uppercase border-2 border-current px-3 py-1 rounded-full tracking-tighter shrink-0">{item.type}</div>
-                         <div className="flex-1 min-w-0">
-                           <div className="font-black text-xl uppercase truncate tracking-tight">{item.title || item.name}</div>
-                           <div className="text-xs opacity-50 truncate italic mt-1">{item.desc || item.content}</div>
-                         </div>
-                         <ChevronRight size={20} className="opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all" />
+                <div className="flex-1 overflow-y-auto p-8 max-w-3xl mx-auto w-full space-y-4">
+                  {searchResults.map((item: any, idx) => (
+                    <motion.div 
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      onClick={() => {
+                        if (item.type === 'chat') { setSelectedChat(item); setActivePage('chat_detail'); }
+                        else setActivePage('home');
+                        setIsSearchOpen(false);
+                      }}
+                      className="p-6 rounded-[2rem] hover:bg-gray-50 flex items-center gap-6 cursor-pointer group shadow-elegant"
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center font-bold text-[10px] uppercase">{item.type}</div>
+                      <div className="flex-1">
+                        <div className="font-bold text-lg">{item.title}</div>
+                        <div className="text-sm text-gray-400 truncate">{item.desc}</div>
                       </div>
-                    ))
-                  ) : searchQuery.trim() ? (
-                    <div className="p-20 text-center opacity-20 font-black uppercase tracking-[0.5em]">虚无...</div>
-                  ) : (
-                    <div className="p-12 space-y-8">
-                       <h3 className="text-[10px] font-black uppercase tracking-widest opacity-30">推荐探索</h3>
-                       <div className="flex flex-wrap gap-3">
-                         {['# minimalist', '# pure_white', '# shadow', '# symmetry'].map(t => (
-                           <button key={t} onClick={() => setSearchQuery(t)} className="px-4 py-2 border-2 border-noir-black dark:border-noir-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black transition-all">
-                             {t}
-                           </button>
-                         ))}
-                       </div>
-                    </div>
-                  )}
+                      <ChevronRight size={18} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -446,236 +338,255 @@ export default function App() {
           <div className="flex-1 overflow-y-auto pb-24 lg:pb-0 scroll-smooth">
             <AnimatePresence mode="wait">
               
+              {/* HOME PAGE */}
               {activePage === 'home' && (
                 <PageTransition key="home">
-                  <header className="sticky top-0 z-30 bg-noir-white/80 dark:bg-noir-black/80 backdrop-blur-xl border-b border-noir-black/5 dark:border-noir-white/5 px-6 h-16 lg:h-24 flex items-center justify-between shadow-sm">
-                    <button onClick={() => setActivePage('create_picker')} className="lg:hidden p-3 bg-noir-black/5 rounded-2xl"><Shield size={24} /></button>
-                    <h1 className="text-3xl font-black uppercase tracking-tight italic">万象</h1>
-                    <button onClick={() => setIsSearchOpen(true)} className="p-3 bg-noir-black/5 dark:bg-noir-white/5 rounded-2xl hover:shadow-md"><Search size={24} /></button>
+                  <header className="sticky top-0 z-30 glass-morphism h-20 lg:h-24 px-8 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <IconButton icon={Plus} className="lg:hidden" onClick={() => setActivePage('create_picker')} />
+                      <h1 className="text-2xl font-black tracking-tight text-gray-900">此刻万象</h1>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <IconButton icon={Search} onClick={() => setIsSearchOpen(true)} />
+                      <IconButton icon={Bell} className="relative">
+                        <span className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+                      </IconButton>
+                    </div>
                   </header>
                   
-                  <div className="max-w-4xl mx-auto py-12 px-4 lg:px-8 space-y-8">
+                  <div className="max-w-3xl mx-auto py-10 px-6 space-y-10">
                     {posts.map(post => (
-                      <div key={post.id} className="p-8 lg:p-12 bg-noir-white dark:bg-noir-black border border-noir-black/5 dark:border-noir-white/5 rounded-[3rem] shadow-soft hover:shadow-2xl transition-all group">
-                        <div className="flex gap-6 lg:gap-10">
-                          <div className="shrink-0">
-                            <img src={post.avatar} className="w-14 h-14 lg:w-20 lg:h-20 rounded-3xl border-2 border-noir-black/10 dark:border-noir-white/10 object-cover shadow-sm" referrerPolicy="no-referrer" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-4">
-                              <span className="font-black text-base lg:text-xl uppercase tracking-tighter flex items-center gap-2">
-                                {post.author}
-                                <Circle size={6} fill="currentColor" className="opacity-20" />
-                                <span className="text-[10px] opacity-20 tracking-widest">{post.timestamp}</span>
-                              </span>
+                      <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        key={post.id} 
+                        className="bg-white p-8 lg:p-10 rounded-[3rem] border border-gray-50 shadow-elegant hover:shadow-deep transition-all"
+                      >
+                         <div className="flex gap-6">
+                            <img src={post.avatar} className="w-14 h-14 rounded-2xl object-cover hover:scale-110 transition-transform cursor-pointer" />
+                            <div className="flex-1">
+                               <div className="flex justify-between items-center mb-4">
+                                  <div className="flex flex-col">
+                                     <span className="font-bold text-lg hover:underline cursor-pointer">{post.author}</span>
+                                     <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">{post.timestamp}</span>
+                                  </div>
+                                  <IconButton icon={MoreHorizontal} className="!p-2 bg-transparent hover:bg-gray-50" />
+                               </div>
+                               <p className="text-lg leading-relaxed text-gray-800 mb-6 font-medium whitespace-pre-wrap">{post.content}</p>
+                               {post.image && (
+                                 <div className="rounded-[2.5rem] overflow-hidden mb-6 border border-gray-100 group">
+                                    <img src={post.image} className="w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                 </div>
+                               )}
+                               <div className="flex gap-8 items-center border-t border-gray-50 pt-6">
+                                  <button onClick={() => setPosts(prev => prev.map(p => p.id === post.id ? { ...p, isLiked: !p.isLiked, likes: p.isLiked ? p.likes-1 : p.likes+1 } : p))} 
+                                    className={`flex items-center gap-2 text-sm font-bold transition-all ${post.isLiked ? 'text-pink-500 scale-110' : 'text-gray-300 hover:text-gray-900'}`}>
+                                    <Heart size={20} fill={post.isLiked ? 'currentColor' : 'none'} />
+                                    <span>{post.likes}</span>
+                                  </button>
+                                  <button className="flex items-center gap-2 text-sm font-bold text-gray-300 hover:text-gray-900 transition-all">
+                                    <MessageSquare size={20} />
+                                    <span>{post.comments}</span>
+                                  </button>
+                                  <button className="ml-auto text-gray-300 hover:text-gray-900 transition-all">
+                                    <Share2 size={20} />
+                                  </button>
+                               </div>
                             </div>
-                            <p className="text-lg lg:text-xl leading-relaxed mb-8 font-medium">{post.content}</p>
-                            {post.image && (
-                              <div className="relative mb-8 overflow-hidden rounded-[2rem] border border-noir-black/5 shadow-inner">
-                                <img src={post.image} className="w-full grayscale hover:grayscale-0 transition-all duration-700 cursor-zoom-in scale-100 hover:scale-105" referrerPolicy="no-referrer" />
-                              </div>
-                            )}
-                            <div className="flex gap-12 lg:gap-16">
-                               <button 
-                                 onClick={() => toggleLike(post.id)}
-                                 className={`flex items-center gap-3 text-sm font-black transition-all ${post.isLiked ? 'text-noir-black dark:text-noir-white scale-110' : 'opacity-20 hover:opacity-100 hover:scale-110'}`}
-                               >
-                                 <Star size={24} fill={post.isLiked ? 'currentColor' : 'none'} strokeWidth={2.5} />
-                                 <span className="tabular-nums">{post.likes}</span>
-                               </button>
-                               <button className="flex items-center gap-3 text-sm font-black opacity-20 hover:opacity-100 transition-all hover:scale-110">
-                                 <MessageSquare size={24} strokeWidth={2.5} />
-                                 <span className="tabular-nums">{post.comments}</span>
-                               </button>
-                               <button 
-                                 onClick={() => toggleCollect(post.id)}
-                                 className={`flex items-center gap-3 text-sm font-black transition-all ${post.isCollected ? 'text-noir-black dark:text-noir-white scale-110' : 'opacity-20 hover:opacity-100 hover:scale-110'}`}
-                                >
-                                  <Bookmark size={24} fill={post.isCollected ? 'currentColor' : 'none'} strokeWidth={2.5} />
-                                </button>
-                             </div>
-                           </div>
                          </div>
-                       </div>
-                     ))}
-                     
-                     <div className="py-24 text-center opacity-5 font-black uppercase tracking-[1.5em] select-none">LIMINAL SPACE</div>
-                   </div>
+                      </motion.div>
+                    ))}
+                    <div className="py-20 text-center text-[10px] font-bold text-gray-100 tracking-[1em] uppercase">已到达意识深处</div>
+                  </div>
                 </PageTransition>
               )}
 
+              {/* MESSAGES */}
               {activePage === 'messages' && (
                 <PageTransition key="messages">
-                  <header className="sticky top-0 z-30 bg-noir-white/80 dark:bg-noir-black/80 backdrop-blur-xl border-b border-noir-black/5 dark:border-noir-white/5 px-6 h-16 lg:h-24 flex items-center justify-between shadow-sm">
-                    <h1 className="text-3xl font-black uppercase tracking-tight italic">消息中心</h1>
-                    <button onClick={() => setIsSearchOpen(true)} className="p-3 bg-noir-black/5 dark:bg-noir-white/5 rounded-2xl hover:shadow-md"><Search size={26} /></button>
-                  </header>
-                  <div className="p-4 lg:p-8 space-y-4">
-                    {MOCK_CHATS.map(chat => (
-                      <div key={chat.id} onClick={() => navigateToChat(chat)} className="p-8 rounded-[2.5rem] flex items-center gap-6 bg-noir-white dark:bg-noir-black border border-noir-black/5 dark:border-noir-white/5 hover:shadow-2xl hover:-translate-y-1 cursor-pointer transition-all group">
-                        <div className="relative">
-                          <img src={chat.avatar} className="w-20 h-20 rounded-3xl border-2 border-noir-black/10 dark:border-noir-white/10 grayscale group-hover:grayscale-0 transition-all shadow-sm" />
-                          {chat.isGroup && <div className="absolute -bottom-2 -right-2 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black text-[10px] font-black px-3 py-1 rounded-full border-2 border-current uppercase shadow-lg">GP</div>}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-baseline mb-2">
-                            <h2 className="font-black text-2xl uppercase tracking-tighter">{chat.name}</h2>
-                            <span className="text-[10px] font-black uppercase opacity-20 tracking-widest">{chat.timestamp}</span>
+                   <header className="h-24 px-8 flex items-center justify-between border-b border-gray-50">
+                      <h1 className="text-3xl font-black tracking-tighter">极简交流</h1>
+                      <IconButton icon={Settings} />
+                   </header>
+                   <div className="p-6 lg:p-10 space-y-4">
+                     {MOCK_CHATS.map(chat => (
+                       <div key={chat.id} onClick={() => { setSelectedChat(chat); setActivePage('chat_detail'); }} className="p-8 rounded-[2.5rem] bg-white border border-gray-50 hover:bg-gray-50 transition-all cursor-pointer flex items-center gap-6 shadow-elegant hover:-translate-y-1">
+                          <div className="relative">
+                            <img src={chat.avatar} className="w-16 h-16 rounded-[1.5rem] object-cover" />
+                            {chat.isGroup && <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center text-[8px] font-bold border-2 border-white">G</div>}
                           </div>
-                          <p className="text-base opacity-40 truncate italic font-medium tracking-tight">“{chat.lastMessage}”</p>
-                        </div>
-                        <ChevronRight className="opacity-0 group-hover:opacity-100 transition-all -translate-x-6 group-hover:translate-x-0" size={28} />
-                      </div>
-                    ))}
-                  </div>
+                          <div className="flex-1 min-w-0">
+                             <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="font-bold text-xl">{chat.name}</h3>
+                                <span className="text-[10px] text-gray-300 font-bold">{chat.timestamp}</span>
+                             </div>
+                             <p className="text-sm text-gray-400 truncate font-medium">“{chat.lastMessage}”</p>
+                          </div>
+                          <ChevronRight size={20} className="text-gray-200" />
+                       </div>
+                     ))}
+                   </div>
                 </PageTransition>
               )}
 
-              {activePage === 'chat_detail' && (
+              {/* CHAT DETAIL */}
+              {activePage === 'chat_detail' && selectedChat && (
                 <PageTransition key="chat_detail">
-                  <header className="sticky top-0 z-40 bg-noir-white/90 dark:bg-noir-black/90 backdrop-blur-xl border-b border-noir-black/10 dark:border-noir-white/10 px-8 h-16 lg:h-24 flex items-center gap-6 shadow-sm">
-                    <button onClick={() => setActivePage('messages')} className="lg:hidden p-3 bg-noir-black/5 rounded-2xl"><ArrowLeft size={24} /></button>
-                    <div className="w-12 h-12 rounded-2xl border-2 border-noir-black dark:border-noir-white overflow-hidden shrink-0 shadow-sm">
-                      <img src={selectedChat?.avatar} className="w-full h-full object-cover grayscale" />
-                    </div>
-                    <h1 className="flex-1 font-black uppercase text-xl lg:text-2xl truncate tracking-tighter">{selectedChat?.name}</h1>
-                    <button className="p-3 bg-noir-black/5 dark:bg-noir-white/5 rounded-2xl hover:shadow-md transition-all"><MoreHorizontal size={24} /></button>
-                  </header>
-
-                  <div className="flex-1 p-8 lg:p-12 space-y-10 overflow-y-auto">
-                    {selectedChat && chatHistories[selectedChat.id]?.map((msg) => (
-                      <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] lg:max-w-[55%] p-6 lg:p-8 text-base lg:text-lg font-bold flex flex-col gap-3 rounded-[2.5rem]
-                          ${msg.sender === 'me' 
-                            ? 'bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black shadow-2xl rounded-tr-none' 
-                            : 'bg-noir-black/5 dark:bg-noir-white/5 border border-noir-black/10 rounded-tl-none'}`}>
-                          {msg.text}
-                          <div className={`text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mt-2 ${msg.sender === 'me' ? 'text-right' : 'text-left'}`}>{msg.timestamp}</div>
+                   <header className="h-24 px-8 flex items-center gap-6 border-b border-gray-50 glass-morphism sticky top-0 z-40">
+                      <IconButton icon={ArrowLeft} onClick={() => setActivePage('messages')} />
+                      <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-100">
+                         <img src={selectedChat.avatar} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1">
+                         <h2 className="font-bold text-xl">{selectedChat.name}</h2>
+                         <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                            <span className="text-[10px] text-gray-400 font-bold uppercase">在线</span>
+                         </div>
+                      </div>
+                      <IconButton icon={MoreHorizontal} />
+                   </header>
+                   <div className="flex-1 p-8 space-y-8 overflow-y-auto min-h-0">
+                      {chatHistories[selectedChat.id]?.map(msg => (
+                        <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                           <div className={`max-w-[75%] p-6 rounded-[2rem] text-sm lg:text-base font-medium shadow-elegant ${msg.sender === 'me' ? 'bg-gray-900 text-white rounded-tr-none' : 'bg-gray-50 text-gray-900 rounded-tl-none'}`}>
+                              {msg.text}
+                              <div className={`text-[9px] mt-2 opacity-40 font-bold uppercase tracking-widest ${msg.sender === 'me' ? 'text-right' : 'text-left'}`}>{msg.timestamp}</div>
+                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-8 lg:p-12 border-t border-noir-black/10 dark:border-noir-white/10 bg-noir-white/95 dark:bg-noir-black/95 sticky bottom-0 z-40 backdrop-blur-md">
-                    <div className="flex gap-6 items-center max-w-5xl mx-auto bg-noir-black/5 dark:bg-noir-white/5 p-4 rounded-[3rem] shadow-inner border border-noir-black/5">
-                       <input 
-                         autoFocus
-                         type="text" 
-                         value={chatInput}
-                         onChange={(e) => setChatInput(e.target.value)}
-                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                         placeholder="向深核发送讯息..."
-                         className="flex-1 bg-transparent p-4 text-xl font-black focus:outline-none placeholder:opacity-10 uppercase tracking-tighter"
-                       />
-                       <button onClick={handleSendMessage} className="p-5 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black rounded-full shadow-xl hover:scale-110 active:scale-90 transition-all">
-                         <Send size={28} strokeWidth={3} />
-                       </button>
-                    </div>
-                  </div>
-                </PageTransition>
-              )}
-
-              {activePage === 'profile' && (
-                <PageTransition key="profile">
-                   <div className="max-w-xl mx-auto py-24 px-8 flex flex-col items-center">
-                      <div className="relative mb-12 group">
-                        <div className="w-48 h-48 rounded-[3.5rem] border-[12px] border-noir-black dark:border-noir-white overflow-hidden bg-noir-black/5 shadow-2xl">
-                          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300" className="w-full h-full object-cover transition-all grayscale group-hover:grayscale-0 duration-1000 scale-100 group-hover:scale-110" />
-                        </div>
-                        <div className="absolute -bottom-2 -right-2 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black px-5 py-2 font-black text-sm uppercase tracking-widest border-4 border-current rounded-3xl shadow-2xl">VETERAN LOG</div>
-                      </div>
-                      
-                      <h1 className="text-6xl font-black uppercase mb-4 tracking-tighter selection:bg-noir-black selection:text-noir-white italic">虚空游者</h1>
-                      <p className="text-[10px] font-black opacity-20 uppercase tracking-[1em] mb-16">NOIR SOCIAL ID #0001</p>
-                      
-                      <div className="w-full flex flex-col gap-4 mb-20">
-                        {[
-                          { label: '我的发布集', count: 12 },
-                          { label: '深空收藏夹', count: 56 },
-                          { label: '黑白影集库', count: 3 }
-                        ].map((item, idx) => (
-                          <button key={idx} className="w-full p-10 flex items-center justify-between bg-noir-white dark:bg-noir-black rounded-[2.5rem] border border-noir-black/5 dark:border-noir-white/5 hover:border-noir-black dark:hover:border-noir-white hover:shadow-2xl hover:scale-[1.02] transition-all group">
-                            <span className="font-black text-xl lg:text-2xl uppercase tracking-tighter">{item.label}</span>
-                            <div className="flex items-center gap-4">
-                              <span className="text-xs font-black opacity-20 px-5 py-2 bg-noir-black/5 dark:bg-noir-white/5 rounded-full group-hover:opacity-100 group-hover:bg-noir-black group-hover:text-noir-white dark:group-hover:bg-noir-white dark:group-hover:text-noir-black transition-all tabular-nums tracking-widest">{item.count}</span>
-                              <ChevronRight size={20} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="flex flex-col items-center gap-10 p-12 bg-noir-black/5 dark:bg-noir-white/5 rounded-[4rem] w-full border border-noir-black/5">
-                        <span className="text-[10px] font-black opacity-20 uppercase tracking-[1em]">视觉场域调节</span>
-                        <DarkModeToggle />
+                      ))}
+                   </div>
+                   <div className="p-8 border-t border-gray-50 bg-white/80 backdrop-blur-md">
+                      <div className="max-w-4xl mx-auto flex items-center gap-4 bg-gray-50 p-3 rounded-[2rem] border border-gray-100 shadow-inner">
+                         <input 
+                           autoFocus
+                           className="flex-1 bg-transparent p-3 text-lg font-bold focus:outline-none placeholder:text-gray-300"
+                           placeholder="在此编织你的文字..."
+                           value={chatInput}
+                           onChange={(e) => setChatInput(e.target.value)}
+                           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                         />
+                         <button onClick={handleSendMessage} className="p-4 bg-gray-900 text-white rounded-full hover:scale-110 active:scale-90 transition-all shadow-lg">
+                           <Send size={20} fill="currentColor" />
+                         </button>
                       </div>
                    </div>
                 </PageTransition>
               )}
 
+              {/* PROFILE */}
+              {activePage === 'profile' && (
+                <PageTransition key="profile">
+                   <div className="max-w-2xl mx-auto py-20 px-8 flex flex-col items-center">
+                      <div className="w-48 h-48 rounded-[3.5rem] border-[12px] border-white shadow-deep overflow-hidden mb-10 group relative">
+                         <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                         <div className="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white font-bold text-xs uppercase tracking-widest px-4 py-2 bg-gray-900/40 backdrop-blur-sm rounded-full">编辑头像</span>
+                         </div>
+                      </div>
+                      <h1 className="text-5xl font-black italic mb-3">虚空游者</h1>
+                      <p className="text-sm font-bold text-gray-300 uppercase tracking-[0.4em] mb-12">ID #0001 • 极简开拓者</p>
+                      
+                      <div className="w-full grid grid-cols-3 gap-4 mb-16">
+                         {[
+                           { label: '发布的万象', count: 12 },
+                           { label: '感悟的留存', count: 56 },
+                           { label: '连接的心灵', count: 231 }
+                         ].map((s, i) => (
+                           <div key={i} className="p-6 rounded-[2rem] bg-gray-50 flex flex-col items-center gap-2 border border-white hover:shadow-elegant transition-all">
+                              <span className="text-2xl font-black">{s.count}</span>
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter text-center">{s.label}</span>
+                           </div>
+                         ))}
+                      </div>
+
+                      <div className="w-full space-y-4">
+                         {[
+                           { title: '感悟收藏夹', icon: Bookmark },
+                           { title: '系统设置', icon: Settings }
+                         ].map((item, i) => (
+                           <button key={i} className="w-full p-8 rounded-[2.5rem] bg-white border border-gray-50 flex items-center justify-between hover:bg-gray-50 group hover:shadow-elegant transition-all">
+                              <div className="flex items-center gap-4">
+                                 <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:text-gray-900 transition-colors">
+                                    <item.icon size={22} />
+                                 </div>
+                                 <span className="font-bold text-xl">{item.title}</span>
+                              </div>
+                              <ChevronRight size={20} className="text-gray-200" />
+                           </button>
+                         ))}
+                      </div>
+                   </div>
+                </PageTransition>
+              )}
+
+              {/* CREATE PICKER */}
+              {activePage === 'create_picker' && (
+                <PageTransition key="create_picker">
+                   <div className="max-w-4xl mx-auto h-full px-8 flex flex-col justify-center">
+                      <button onClick={() => setActivePage('home')} className="mb-10 text-[10px] font-bold uppercase tracking-widest text-gray-300 hover:text-gray-900 flex items-center gap-2 group transition-colors">
+                         <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" /> 返回万象首页
+                      </button>
+                      <h2 className="text-6xl font-black italic tracking-tighter mb-16 leading-[1.1]">
+                        你想在 <br /> <span className="px-4 py-2 bg-gray-900 text-white rounded-[2rem]">纯白灵感</span> 中 <br /> 写入什么？
+                      </h2>
+                      <div className="grid md:grid-cols-2 gap-8">
+                         <button onClick={() => setActivePage('create_post')} className="p-10 rounded-[3rem] bg-white border border-gray-100 text-left hover:shadow-deep transition-all group hover:-translate-y-2">
+                             <div className="mb-8 p-6 bg-gray-50 rounded-[2rem] inline-block text-gray-300 group-hover:text-gray-900 transition-colors">
+                                <Star size={40} strokeWidth={2} />
+                             </div>
+                             <h4 className="text-3xl font-bold mb-2">发布光影</h4>
+                             <p className="text-sm text-gray-400 font-medium leading-relaxed">用一张图和一段文字，在这片白空间里画下你的心情。</p>
+                         </button>
+                         <button className="p-10 rounded-[3rem] bg-white border border-gray-100 text-left hover:shadow-deep transition-all group opacity-50 cursor-not-allowed">
+                             <div className="mb-8 p-6 bg-gray-100 rounded-[2rem] inline-block text-gray-200">
+                                <Circle size={40} strokeWidth={2} />
+                             </div>
+                             <h4 className="text-3xl font-bold mb-2">创建频道</h4>
+                             <p className="text-sm text-gray-400 font-medium leading-relaxed">聚集志同道合的游者。此功能由于灵感过载正在维护中。</p>
+                         </button>
+                      </div>
+                   </div>
+                </PageTransition>
+              )}
+
+              {/* CREATE POST */}
               {activePage === 'create_post' && (
                 <PageTransition key="create_post">
-                   <header className="sticky top-0 z-40 bg-noir-white/80 dark:bg-noir-black/80 backdrop-blur-xl h-16 lg:h-24 border-b border-noir-black/10 dark:border-noir-white/10 px-8 flex items-center justify-between shadow-sm">
-                      <button onClick={() => setActivePage('create_picker')} className="p-3 bg-noir-black/5 dark:bg-noir-white/5 rounded-2xl hover:shadow-md transition-all"><ArrowLeft size={24} /></button>
-                      <h1 className="text-2xl font-black uppercase tracking-tight italic">记录瞬间</h1>
+                   <header className="h-24 px-8 flex items-center justify-between glass-morphism sticky top-0 z-40">
+                      <IconButton icon={ArrowLeft} onClick={() => setActivePage('create_picker')} />
+                      <h1 className="text-xl font-bold uppercase tracking-widest">描绘光影</h1>
                       <button 
                         onClick={handlePublishPost}
                         disabled={!newPostText.trim() && !selectedImage}
-                        className="px-8 py-3 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black font-black uppercase text-sm tracking-widest rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-20 disabled:scale-100 disabled:shadow-none"
+                        className="px-8 py-3 bg-gray-900 text-white rounded-2xl font-bold text-sm uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-20"
                       >
-                        即刻发布
+                        即刻开启
                       </button>
                    </header>
-                   <div className="p-8 lg:p-12 max-w-4xl mx-auto w-full flex-1 flex flex-col gap-10">
+                   <div className="p-10 max-w-3xl mx-auto w-full flex-1 flex flex-col gap-10">
                       <textarea 
+                        autoFocus
                         value={newPostText}
                         onChange={(e) => setNewPostText(e.target.value)}
-                        placeholder="在黑与白的边缘留下你的印记..."
-                        className="w-full flex-1 min-h-[300px] bg-transparent text-3xl lg:text-4xl font-black focus:outline-none placeholder:opacity-5 selection:bg-noir-black selection:text-noir-white border-none resize-none leading-tight"
-                        autoFocus
+                        placeholder="在纯净的一刻，留下你的意识流..."
+                        className="w-full flex-1 min-h-[300px] bg-transparent text-3xl font-bold focus:outline-none placeholder:text-gray-100 resize-none leading-relaxed"
                       />
-                      
                       {selectedImage && (
-                        <div className="relative group rounded-[3rem] overflow-hidden border-4 border-noir-black dark:border-noir-white shadow-2xl">
-                          <img src={selectedImage} className="w-full max-h-[500px] object-cover grayscale" />
-                          <button onClick={() => setSelectedImage(null)} className="absolute top-6 right-6 p-3 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black rounded-2xl shadow-lg border-2 border-current hover:rotate-90 transition-all"><X size={24} /></button>
+                        <div className="relative rounded-[3rem] overflow-hidden border-2 border-gray-50 shadow-deep group">
+                          <img src={selectedImage} className="w-full max-h-[500px] object-cover" />
+                          <button onClick={() => setSelectedImage(null)} className="absolute top-6 right-6 p-4 bg-white/80 backdrop-blur-md rounded-full shadow-lg hover:rotate-90 transition-all text-gray-900">
+                            <X size={20} />
+                          </button>
                         </div>
                       )}
-
-                      <div className="pt-10 border-t border-noir-black/10 dark:border-noir-white/10 flex items-center justify-between">
-                         <div className="flex gap-6">
-                           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-                           <button onClick={() => fileInputRef.current?.click()} className="px-8 py-4 bg-noir-black/5 dark:bg-noir-white/5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black transition-all shadow-sm">
-                             {selectedImage ? '更换光影图像' : '上传纯净影像'}
-                           </button>
-                         </div>
-                         <div className="text-[10px] font-black opacity-20 uppercase tracking-[0.3em] font-mono">{newPostText.length} CH_TRACKED</div>
-                      </div>
-                   </div>
-                </PageTransition>
-              )}
-
-              {activePage === 'create_picker' && (
-                <PageTransition key="create_picker">
-                   <div className="p-10 lg:p-24 max-w-5xl mx-auto h-full flex flex-col justify-center">
-                      <button onClick={() => setActivePage('home')} className="mb-16 self-start flex items-center gap-4 bg-noir-black/5 dark:bg-noir-white/5 py-3 px-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-all hover:shadow-md">
-                         <ArrowLeft size={18} /> 返回主序
-                      </button>
-                      <h2 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter italic mb-20 leading-[0.9] select-none">
-                        你想在 <br /> <span className="px-4 py-2 bg-noir-black text-noir-white dark:bg-noir-white dark:text-noir-black rounded-3xl shadow-xl">绝对场域</span> 中 <br /> 写入什么？
-                      </h2>
-                      <div className="grid md:grid-cols-2 gap-10">
-                        {[
-                          { id: 'create_post', title: '发布图文动态', desc: '以光影作为唯一的语言', icon: <Star /> },
-                          { id: 'create_channel', title: '建立永久频道', desc: '构建属于你的意识形态广场', icon: <Circle /> }
-                        ].map(item => (
-                          <button key={item.id} onClick={() => setActivePage(item.id as Page)} className="p-12 rounded-[3rem] border border-noir-black/10 dark:border-noir-white/10 text-left bg-noir-white dark:bg-noir-black hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black transition-all group hover:shadow-2xl hover:-translate-y-2">
-                             <div className="mb-10 opacity-30 group-hover:opacity-100 transition-all scale-100 group-hover:scale-110">
-                               {React.cloneElement(item.icon as React.ReactElement, { size: 56, strokeWidth: 2.5 })}
-                             </div>
-                             <div className="text-3xl font-black uppercase tracking-tighter mb-3">{item.title}</div>
-                             <div className="text-xs font-black opacity-30 uppercase tracking-[0.2em] leading-relaxed group-hover:opacity-60">{item.desc}</div>
-                          </button>
-                        ))}
+                      <div className="pt-8 border-t border-gray-50 flex items-center justify-between">
+                         <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                         <button onClick={() => fileInputRef.current?.click()} className="px-8 py-4 bg-gray-50 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors">
+                           {selectedImage ? '重新捕捉影像' : '上传纯净原片'}
+                         </button>
+                         <span className="text-[10px] font-bold text-gray-200 uppercase tracking-widest">{newPostText.length} 符号</span>
                       </div>
                    </div>
                 </PageTransition>
@@ -684,60 +595,55 @@ export default function App() {
             </AnimatePresence>
           </div>
 
-          <nav className="lg:hidden absolute bottom-0 w-full h-16 bg-noir-white dark:bg-noir-black border-t-4 border-noir-black dark:border-noir-white grid grid-cols-3 z-30">
-            <NavItem page="home" icon={Star} label="万象" />
-            <NavItem page="messages" icon={Circle} label="消息" />
-            <NavItem page="profile" icon={User} label="个人" />
+          {/* Bottom Bar Mobile */}
+          <nav className="lg:hidden absolute bottom-0 w-full h-20 bg-white/70 backdrop-blur-3xl border-t border-gray-50 grid grid-cols-3 z-40 px-4 items-center">
+            <NavItem page="home" icon={Star} label="发现" />
+            <NavItem page="messages" icon={MessageSquare} label="交流" />
+            <NavItem page="profile" icon={User} label="我的" />
           </nav>
         </main>
 
-        <aside className="hidden xl:flex w-[400px] flex-col p-12 space-y-12 z-40">
-           <div className="p-10 rounded-[3rem] bg-noir-black/5 dark:bg-noir-white/5 border border-noir-black/5 flex flex-col gap-8 shadow-inner">
-              <div className="flex justify-between items-center">
-                 <h3 className="text-[10px] font-black uppercase tracking-[0.6em] opacity-30">深海意识流</h3>
-                 <div className="flex gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-noir-black dark:bg-noir-white animate-pulse" />
-                 </div>
+        {/* --- Right Aside --- */}
+        <aside className="hidden xl:flex w-[420px] flex-col p-10 space-y-10 z-30">
+           <div className="p-10 rounded-[3rem] bg-gray-50 border border-white shadow-inner flex flex-col gap-6">
+              <div className="flex justify-between items-center opacity-40">
+                 <span className="text-[10px] font-bold uppercase tracking-[0.4em]">今日意识形态</span>
+                 <div className="w-2 h-2 rounded-full bg-gray-900 animate-ping" />
               </div>
-              <div className="flex flex-col gap-6">
-                 <div className="flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase opacity-20 tracking-widest text-center lg:text-left">极简世界共鸣</span>
-                    <span className="text-3xl font-black uppercase italic tracking-tighter truncate leading-none">THE PURE ESSENCE.</span>
-                 </div>
-                 <div className="h-2 w-full bg-noir-black/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-noir-black dark:bg-noir-white w-2/3 shadow-lg" />
-                 </div>
+              <h3 className="text-4xl font-black italic tracking-tighter leading-tight">WHITE IS <br /> THE NEW <br /> EVERYTHING.</h3>
+              <div className="flex items-center gap-3 mt-4">
+                 <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-bold text-xs uppercase shadow-sm">1.8k</div>
+                 <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">游者共鸣中</span>
               </div>
            </div>
 
-           <div className="space-y-12">
-              <h3 className="text-[10px] font-black uppercase tracking-[1em] opacity-20 text-center lg:text-left">意识流推荐</h3>
-              <div className="space-y-8">
+           <div className="space-y-8">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.6em] text-gray-300 px-6">为你推荐</h4>
+              <div className="space-y-2">
                 {MOCK_CHANNELS.map(ch => (
-                  <div key={ch.id} className="group cursor-pointer p-6 rounded-[2rem] hover:bg-noir-black hover:text-noir-white dark:hover:bg-noir-white dark:hover:text-noir-black transition-all hover:shadow-xl hover:-translate-x-2">
-                    <div className="flex items-center gap-6 mb-4">
-                       <img src={ch.avatar} className="w-14 h-14 rounded-2xl border-2 border-noir-black/10 dark:border-noir-white/10 grayscale group-hover:grayscale-0 transition-all shadow-sm" />
-                       <div className="flex-1">
-                          <h4 className="text-lg font-black uppercase tracking-tighter group-hover:underline">{ch.name}</h4>
-                          <p className="text-[10px] opacity-40 font-black uppercase tracking-widest mt-1">{ch.memberCount} M_BITS</p>
-                       </div>
-                    </div>
-                    <p className="text-xs font-medium leading-relaxed italic opacity-40 group-hover:opacity-100 transition-opacity px-2 border-l-2 border-current">“{ch.desc}”</p>
+                  <div key={ch.id} className="p-6 rounded-[2.2rem] hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all cursor-pointer group">
+                     <div className="flex items-center gap-4 mb-3">
+                        <img src={ch.avatar} className="w-12 h-12 rounded-2xl object-cover grayscale group-hover:grayscale-0 transition-all" />
+                        <div className="flex-1">
+                           <h5 className="font-bold text-lg group-hover:underline">{ch.name}</h5>
+                           <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{ch.memberCount} 参与者</span>
+                        </div>
+                     </div>
+                     <p className="text-xs text-gray-400 font-medium italic pl-16 opacity-60 group-hover:opacity-100 transition-opacity">“{ch.desc}”</p>
                   </div>
                 ))}
               </div>
            </div>
 
-           <div className="mt-auto space-y-4">
-              <div className="p-6 border-2 border-noir-black/10 dark:border-noir-white/10 hover:border-noir-black dark:hover:border-noir-white transition-all">
-                <h5 className="text-[9px] font-black uppercase tracking-widest mb-2 italic">黑白格言.</h5>
-                <p className="text-xs font-bold leading-relaxed opacity-60">
-                  “去掉色彩，便是去掉谎言。只留下纯粹的结构与真相。”
-                </p>
+           <div className="mt-auto space-y-6 px-4">
+              <div className="p-8 rounded-[2.5rem] bg-gray-50 border border-white italic">
+                 <p className="text-sm font-medium text-gray-400 leading-relaxed">
+                   “在这个喧嚣的世界，我们构建一个绝对纯白的港湾。没有杂念，只有最纯粹的表达。”
+                 </p>
               </div>
-              <div className="flex justify-between text-[8px] font-black uppercase opacity-20 tracking-widest px-1">
-                 <span>© NOIR. v2.0</span>
-                 <span>PRIVACY. ESSENCE.</span>
+              <div className="flex items-center justify-between text-[8px] font-bold text-gray-200 uppercase tracking-[0.5em] px-2">
+                 <span>VER 3.0 PURE</span>
+                 <span>LOGGED IN</span>
               </div>
            </div>
         </aside>
